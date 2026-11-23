@@ -1,125 +1,107 @@
--- DIRTSTORM XT™ Roblox prototype
--- Place this Script in ServerScriptService of a Roblox Studio Baseplate.
+-- Dirtstorm XT™ v0.2 | Roblox Studio ServerScriptService
+-- Server-authoritative, free-to-play arcade prototype. No purchases or data collection.
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local Workspace = game:GetService("Workspace")
-local existing = Workspace:FindFirstChild("DirtstormXT")
-if existing then existing:Destroy() end
-local world = Instance.new("Folder")
-world.Name = "DirtstormXT"
-world.Parent = Workspace
-local function part(name, size, cf, color, material, anchored, parent)
-    local p = Instance.new("Part")
-    p.Name, p.Size, p.CFrame, p.Color = name, size, cf, color
-    p.Material = material or Enum.Material.SmoothPlastic
-    p.Anchored = anchored ~= false
-    p.Parent = parent or world
-    return p
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local World = game:GetService("Workspace")
+local old = World:FindFirstChild("DirtstormXT")
+if old then old:Destroy() end
+local root = Instance.new("Folder"); root.Name="DirtstormXT"; root.Parent=World
+local remote = ReplicatedStorage:FindFirstChild("DirtstormCustomize") or Instance.new("RemoteEvent")
+remote.Name="DirtstormCustomize"; remote.Parent=ReplicatedStorage
+local colors = {
+  Blue=Color3.fromRGB(25,110,245), Red=Color3.fromRGB(220,43,48),
+  Gold=Color3.fromRGB(245,179,24), Green=Color3.fromRGB(39,176,104),
+}
+local function block(name,size,cf,color,material,parent)
+  local p=Instance.new("Part")
+  p.Name=name;p.Size=size;p.CFrame=cf;p.Color=color
+  p.Material=material or Enum.Material.SmoothPlastic
+  p.Anchored=true;p.Parent=parent or root
+  return p
 end
-local dirt = Color3.fromRGB(113,73,42)
-local gold = Color3.fromRGB(255,185,23)
-local blue = Color3.fromRGB(30,111,239)
-part("Ground", Vector3.new(400,2,310), CFrame.new(0,-2,0), Color3.fromRGB(50,110,65), Enum.Material.Grass)
-part("DirtTrack", Vector3.new(260,1,170), CFrame.new(0,-0.45,0), dirt, Enum.Material.Ground)
-part("Infield", Vector3.new(160,1.1,75), CFrame.new(0,-0.35,0), Color3.fromRGB(50,110,65), Enum.Material.Grass)
-for _,z in ipairs({-90,90}) do part("Barrier",Vector3.new(280,5,3),CFrame.new(0,2,z),gold,Enum.Material.Metal) end
-for _,x in ipairs({-135,135}) do part("Barrier",Vector3.new(3,5,180),CFrame.new(x,2,0),gold,Enum.Material.Metal) end
-local checkpoints = {}
-local positions = {Vector3.new(-105,3,-65),Vector3.new(105,3,-65),Vector3.new(105,3,65),Vector3.new(-105,3,65)}
-for i,pos in ipairs(positions) do
-    local gate = part("Checkpoint"..i,Vector3.new(4,11,19),CFrame.new(pos),i==1 and gold or Color3.fromRGB(38,221,219),Enum.Material.Neon)
-    gate.Transparency = 0.55
-    gate.CanCollide = false
-    checkpoints[i] = gate
+block("Ground",Vector3.new(380,2,280),CFrame.new(0,-2,0),Color3.fromRGB(60,123,74),Enum.Material.Grass)
+block("Track",Vector3.new(270,1,185),CFrame.new(0,-0.45,0),Color3.fromRGB(124,81,48),Enum.Material.Ground)
+block("Infield",Vector3.new(170,1.1,85),CFrame.new(0,-0.35,0),Color3.fromRGB(59,120,69),Enum.Material.Grass)
+for _,z in ipairs({-94,94}) do block("Barrier",Vector3.new(276,5,3),CFrame.new(0,2,z),Color3.fromRGB(248,180,28),Enum.Material.Metal) end
+for _,x in ipairs({-138,138}) do block("Barrier",Vector3.new(3,5,191),CFrame.new(x,2,0),Color3.fromRGB(248,180,28),Enum.Material.Metal) end
+local gates={
+  Vector3.new(-108,2,-68),Vector3.new(108,2,-68),
+  Vector3.new(108,2,68),Vector3.new(-108,2,68)
+}
+for i,pos in ipairs(gates) do
+  local g=block("Gate"..i,Vector3.new(16,7,16),CFrame.new(pos),Color3.fromRGB(45,226,219),Enum.Material.Neon)
+  g.Transparency=.78;g.CanCollide=false
 end
-local truck = Instance.new("Model")
-truck.Name = "XT_Blue_01"
-truck.Parent = world
-local start = CFrame.new(-105,4,58) * CFrame.Angles(0,math.rad(-90),0)
-local chassis = part("Chassis",Vector3.new(9,2.2,14),start,blue,Enum.Material.Metal,false,truck)
-chassis.CustomPhysicalProperties = PhysicalProperties.new(1,0.7,0.1)
-truck.PrimaryPart = chassis
-local seat = Instance.new("VehicleSeat")
-seat.Name,seat.Size,seat.CFrame = "DriverSeat",Vector3.new(4,1,4),start*CFrame.new(0,2,0)
-seat.Color = Color3.fromRGB(18,18,22)
-seat.Anchored = false
-seat.Parent = truck
-local seatWeld = Instance.new("WeldConstraint")
-seatWeld.Part0,seatWeld.Part1,seatWeld.Parent = chassis,seat,seat
-local function detail(name,size,offset,color,material,shape)
-    local p = part(name,size,start*offset,color,material,false,truck)
-    if shape then p.Shape = shape end
-    p.CanCollide,p.Massless = false,true
-    local weld = Instance.new("WeldConstraint")
-    weld.Part0,weld.Part1,weld.Parent = chassis,p,p
-    return p
+local sign=block("Sign",Vector3.new(58,9,2),CFrame.new(0,15,-100),Color3.fromRGB(19,19,24),Enum.Material.Metal)
+local surface=Instance.new("SurfaceGui");surface.Face=Enum.NormalId.Front;surface.Parent=sign
+local title=Instance.new("TextLabel");title.Size=UDim2.fromScale(1,1);title.BackgroundTransparency=1
+title.Text="DIRTSTORM XT | THRILLFUSION";title.TextScaled=true;title.Font=Enum.Font.GothamBold
+title.TextColor3=Color3.fromRGB(255,194,32);title.Parent=surface
+local states={}
+local function truckPart(model,name,size,offset,color,shape)
+  local p=block(name,size,model:GetPivot()*offset,color,Enum.Material.SmoothPlastic,model)
+  p.CanCollide=false
+  if shape then p.Shape=shape end
+  return p
 end
-detail("Cab",Vector3.new(7,2.5,6),CFrame.new(0,2,1.5),Color3.fromRGB(13,25,46),Enum.Material.SmoothPlastic)
-detail("HoodStripe",Vector3.new(6,0.15,3),CFrame.new(0,1.2,-4),gold,Enum.Material.Neon)
-for _,x in ipairs({-5,5}) do
-    for _,z in ipairs({-4.5,4.5}) do
-        detail("OversizedWheel",Vector3.new(4.5,2.5,4.5),CFrame.new(x,-0.3,z)*CFrame.Angles(0,0,math.rad(90)),Color3.fromRGB(23,23,25),Enum.Material.Rubber,Enum.PartType.Cylinder)
-    end
+local function spawnTruck(player)
+  local index=(player.UserId%6)
+  local start=CFrame.new(-117+index*4,3,69)*CFrame.Angles(0,math.pi,0)
+  local model=Instance.new("Model");model.Name="XT_"..player.UserId;model.Parent=root
+  local base=block("Chassis",Vector3.new(8,2,13),start,colors.Blue,Enum.Material.Metal,model)
+  base.CanCollide=false;model.PrimaryPart=base
+  local seat=Instance.new("VehicleSeat")
+  seat.Name="Drive";seat.Size=Vector3.new(4,1,4);seat.CFrame=start*CFrame.new(0,1.6,0)
+  seat.Anchored=true;seat.CanCollide=false;seat.Parent=model
+  truckPart(model,"Cab",Vector3.new(7,3,5),CFrame.new(0,2,2),Color3.fromRGB(18,28,44))
+  truckPart(model,"Stripe",Vector3.new(6,.12,3),CFrame.new(0,1.06,-3),colors.Gold)
+  for _,x in ipairs({-4.5,4.5}) do for _,z in ipairs({-4,4}) do
+    truckPart(model,"Wheel",Vector3.new(4,2,4),CFrame.new(x,-.35,z)*CFrame.Angles(0,0,math.pi/2),Color3.fromRGB(21,22,26),Enum.PartType.Cylinder)
+  end end
+  local s={model=model,seat=seat,cf=start,speed=0,gate=1,lastGate=0,paint="Blue",laps=0}
+  states[player]=s
+  return s
 end
-local attachment = Instance.new("Attachment")
-attachment.Parent = chassis
-local velocity = Instance.new("LinearVelocity")
-velocity.Attachment0 = attachment
-velocity.MaxForce = 50000
-velocity.VectorVelocity = Vector3.zero
-velocity.RelativeTo = Enum.ActuatorRelativeTo.World
-velocity.Parent = chassis
-local orient = Instance.new("AlignOrientation")
-orient.Attachment0 = attachment
-orient.Mode = Enum.OrientationAlignmentMode.OneAttachment
-orient.MaxTorque = 200000
-orient.Responsiveness = 12
-orient.Parent = chassis
-local state = {}
-local function setupPlayer(player)
-    local stats = Instance.new("Folder")
-    stats.Name,stats.Parent = "leaderstats",player
-    local laps = Instance.new("IntValue")
-    laps.Name,laps.Parent = "Laps",stats
-    state[player] = {nextGate=1,lastGateAt=0}
-end
-Players.PlayerAdded:Connect(setupPlayer)
-for _,p in ipairs(Players:GetPlayers()) do setupPlayer(p) end
-Players.PlayerRemoving:Connect(function(player) state[player] = nil end)
-local yaw,speed,clock = math.rad(-90),0,0
-RunService.Heartbeat:Connect(function(dt)
-    dt = math.min(dt,0.05)
-    clock += dt
-    local humanoid = seat.Occupant
-    local player = humanoid and Players:GetPlayerFromCharacter(humanoid.Parent)
-    local throttle = player and seat.ThrottleFloat or 0
-    local steer = player and seat.SteerFloat or 0
-    local targetSpeed = throttle*55
-    speed += (targetSpeed-speed)*math.min(1,dt*2.8)
-    if player then yaw += steer*dt*1.35*math.clamp(math.abs(speed)/20,0.25,1) end
-    local forward = CFrame.Angles(0,yaw,0).LookVector
-    velocity.VectorVelocity = forward*speed + Vector3.new(0,chassis.AssemblyLinearVelocity.Y,0)
-    orient.CFrame = CFrame.Angles(0,yaw,0)
-    if player then
-        local progress = state[player]
-        if progress and clock-progress.lastGateAt > 1.2 then
-            local gate = checkpoints[progress.nextGate]
-            if (chassis.Position-gate.Position).Magnitude < 17 then
-                progress.lastGateAt = clock
-                progress.nextGate += 1
-                if progress.nextGate > #checkpoints then
-                    progress.nextGate = 1
-                    player.leaderstats.Laps.Value += 1
-                end
-            end
-        end
-    end
+Players.PlayerAdded:Connect(function(player)
+  local stats=Instance.new("Folder");stats.Name="leaderstats";stats.Parent=player
+  local laps=Instance.new("IntValue");laps.Name="Laps";laps.Parent=stats
+  local stars=Instance.new("IntValue");stars.Name="Stars";stars.Parent=stats
+  spawnTruck(player)
 end)
-local sign = part("WelcomeSign",Vector3.new(60,10,2),CFrame.new(0,15,-100),Color3.fromRGB(20,20,25),Enum.Material.Metal)
-local gui = Instance.new("SurfaceGui")
-gui.Face,gui.Parent = Enum.NormalId.Front,sign
-local label = Instance.new("TextLabel")
-label.Size,label.BackgroundTransparency = UDim2.fromScale(1,1),1
-label.Text = "DIRTSTORM XT  |  THRILLFUSION"
-label.TextScaled,label.TextColor3,label.Font,label.Parent = true,gold,Enum.Font.GothamBlack,gui
-print("Dirtstorm XT prototype loaded. Sit in XT_Blue_01 and drive through checkpoints.")
+Players.PlayerRemoving:Connect(function(player)
+  local s=states[player];if s then s.model:Destroy() end;states[player]=nil
+end)
+remote.OnServerEvent:Connect(function(player,colorName)
+  if typeof(colorName)~="string" or not colors[colorName] then return end
+  local s=states[player];if not s then return end
+  s.paint=colorName
+  local chassis=s.model:FindFirstChild("Chassis")
+  if chassis then chassis.Color=colors[colorName] end
+end)
+RunService.Heartbeat:Connect(function(dt)
+  dt=math.min(dt,.05)
+  for player,s in pairs(states) do
+    if not s.model.Parent then continue end
+    local occupant=s.seat.Occupant
+    local driving=occupant and Players:GetPlayerFromCharacter(occupant.Parent)==player
+    local throttle=driving and s.seat.ThrottleFloat or 0
+    local steer=driving and s.seat.SteerFloat or 0
+    s.speed+=(throttle*53-s.speed)*math.min(1,dt*2.6)
+    local turn=steer*dt*1.45*math.clamp(math.abs(s.speed)/15,.15,1)
+    local newCf=s.cf*CFrame.Angles(0,turn,0)
+    local pos=newCf.Position+newCf.LookVector*s.speed*dt
+    pos=Vector3.new(math.clamp(pos.X,-127,127),3,math.clamp(pos.Z,-82,82))
+    s.cf=CFrame.new(pos)*newCf.Rotation
+    s.model:PivotTo(s.cf)
+    if driving and os.clock()-s.lastGate>1.1 and (pos-gates[s.gate]).Magnitude<18 then
+      s.lastGate=os.clock();s.gate+=1
+      if s.gate>4 then
+        s.gate=1;s.laps+=1
+        player.leaderstats.Laps.Value=s.laps
+        player.leaderstats.Stars.Value+=1 -- earned through play, not purchase
+      end
+    end
+  end
+end)
+print("Dirtstorm XT v0.2 loaded: garage paint + free race rewards")

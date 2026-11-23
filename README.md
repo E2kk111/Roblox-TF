@@ -1,31 +1,37 @@
-# DIRTSTORM XT™ — ThrillFusion Roblox Prototype
+# DIRTSTORM XT™ — Design Your XT Truck & Race
 
 **ThrillFusion Group™ — Born in Africa. Built for the World.**
 
-An original Roblox Studio racing prototype. Not affiliated with or endorsed by Roblox Corporation.
+## v0.2 Roblox Studio setup
+1. Create a new **Baseplate** experience in Roblox Studio.
+2. Under **ServerScriptService**, insert a **Script** and paste `src/server/DirtstormServer.server.lua`.
+3. Under **StarterPlayer > StarterPlayerScripts**, insert a **LocalScript** and paste `src/client/DirtstormGarage.client.lua`.
+4. Press **Play**. Select a color in the garage panel, sit in your own XT truck, and drive with Roblox vehicle controls.
+5. Cross four glowing checkpoints in sequence. One lap awards one free star.
+6. Use Studio's **Test > Start** with multiple players to check multiplayer behavior.
 
-## Quick start
-1. Open Roblox Studio and create a **Baseplate** experience.
-2. Insert a **Script** under `ServerScriptService`.
-3. Paste the contents of `src/server/DirtstormServer.server.lua`.
-4. Press **Play**, sit in the blue truck, and drive with W/S and A/D.
-5. Drive through the four glowing checkpoints in sequence to count laps.
+## Implemented in source (not yet verified in Studio)
+- Arena generated at server startup
+- Per-player arcade truck models and vehicle seats
+- Server-validated paint colors: blue, red, gold, green
+- Four sequential checkpoints, lap count, free stars
+- Client garage UI and basic leaderboard
 
-## Current implementation
-- Generated dirt arena and barriers
-- One arcade-style blue truck and VehicleSeat controller
-- Four checkpoint gates and player lap leaderboard
-- ThrillFusion arena sign
+## Child safety and book integration
+All core play and garage colors are free. No book purchase, redemption code, external link, trading, gambling mechanic, or real-money purchase is required. Drawing books can optionally include creative prompts that correspond to the free garage and racing activities.
 
-## Status
-**Prototype source only — not verified in Roblox Studio, not published.**
-Limitations: one shared truck, simple arcade physics, no persistent progress, production-grade security, vehicle garage, or matchmaking.
+## Important limitations
+This is a **prototype**, not a published or tested Roblox experience. Studio testing is required to validate seated movement, checkpoint geometry, collision behavior, multiplayer spawning, and mobile controls. Stars exist only for the current server session and are not saved. The current truck uses simple scripted movement rather than production vehicle physics. Do not market it as certified child-safe or production-ready until moderation, accessibility, platform policy, and age-suitability review are completed.
 
-## Roadmap
-1. Validate gameplay and fix vehicle handling in Roblox Studio.
-2. Add per-player vehicle spawning and garage customization.
-3. Add race timing, mobile controls, and multiplayer testing.
-4. Create the XVERSE hub and future original ThrillMon™ and EDO QUEST™ portals.
+## Next QA checklist
+- [ ] Server and client scripts load without errors in Studio Output
+- [ ] Player can sit and drive their truck on desktop
+- [ ] Garage colors update the correct player's truck
+- [ ] Checkpoints count in the intended order
+- [ ] A completed lap awards exactly one star
+- [ ] Two players can race independently
+- [ ] Mobile UI and controls tested
+- [ ] Respawn/reset handling tested
+- [ ] Child safety and Roblox policy review completed
 
-## IP
-Original ThrillFusion concept. Verify rights and contributor agreements before commercial release.
+Original concept; not affiliated with Roblox Corporation.
